@@ -1,0 +1,9 @@
+# macOS
+.DS_Store
+
+# Claude local settings (personal, not to be shared)
+.claude/settings.local.json
+
+# Temporary/output files
+*.tmp
+*.bak
