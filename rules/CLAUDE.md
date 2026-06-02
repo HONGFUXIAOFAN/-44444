@@ -227,6 +227,9 @@ user_confirmation: "每步必确认"
 - `030-user-review-confirmation.md` — 7项逐项最终审查
 - `031-export-word-pdf.md` — 导出 Word/PDF
 
+**反馈迭代类（1条）**：
+- `240-human-feedback-analysis.md` — 人类反馈RCA根因分析+迭代改进
+
 ### 常用命令示例
 
 ```bash
@@ -265,7 +268,8 @@ user_confirmation: "每步必确认"
 │   ├── 020-cost-accounting-substitute.md
 │   ├── 021-food-additive-recommendation.md
 │   ├── 030-user-review-confirmation.md
-│   └── 031-export-word-pdf.md
+│   ├── 031-export-word-pdf.md
+│   └── 240-human-feedback-analysis.md
 ├── templates/
 ├── ssot/
 └── ops/
