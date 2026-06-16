@@ -1,0 +1,173 @@
+---
+rule_id: "012-operation-procedure-generation"
+version: "0.1.0"
+description: "标准化操作流程生成 产出物Gates检查"
+phase: building
+---
+context:
+  purpose: "对 rule-012 标准化操作流程生成规则的产出物进行门禁检查，确保 SSOT、Gates、Rubric 三件套齐全且结构合规，领域行为符合5阶段操作流程标准"
+  scope: "rule-012 的 ssot/recipe-generator/、ops/recipe-generator/、rules/、eval/recipe-generator/ 下的相关产出物"
+  consumer: "ssot-judge、Administrator"
+gates:
+- id: gate0_assets
+  name: "三件套文件存在性检查"
+  description: "检查 SSOT、Gates、Rubric 三个核心文件是否存在"
+  critical: true
+  check: "templates/gate-scripts/check_file_paths.py"
+  params:
+    files:
+      p1: "ssot/recipe-generator/rule-012-operation-procedure-generation.md"
+      p2: "ops/recipe-generator/gates-012-operation-procedure-generation.yaml"
+      p3: "ops/recipe-generator/rubric-012-operation-procedure-generation.yaml"
+- id: gate0_input_ssot_assets
+  name: "输入资产存在性检查（alias）"
+  description: "与 gate0_assets 相同，别名 Gate"
+  critical: true
+  check: "templates/gate-scripts/check_file_paths.py"
+  params:
+    files:
+      p1: "ssot/recipe-generator/rule-012-operation-procedure-generation.md"
+      p2: "ops/recipe-generator/gates-012-operation-procedure-generation.yaml"
+      p3: "ops/recipe-generator/rubric-012-operation-procedure-generation.yaml"
+- id: gate1_ssot_frontmatter
+  name: "SSOT YAML头检查"
+  description: "检查 SSOT 文件 YAML frontmatter 是否包含必填字段"
+  critical: false
+  check: manual
+  params:
+    required_fields:
+      - name
+      - version
+      - description
+      - applies_to
+      - deliverable_vision
+      - configs
+- id: gate2_gates_schema
+  name: "Gates YAML结构检查"
+  description: "检查 Gates YAML 文件是否包含 context、gates、decision 三个顶层键"
+  critical: true
+  check: "templates/gate-scripts/check_yaml_structure.py"
+  params:
+    required_keys:
+      - context
+      - gates
+      - decision
+  also_check: "templates/gate-scripts/check_gate_id_pattern.py"
+- id: gate3_rubric_schema
+  name: "Rubric YAML结构检查"
+  description: "检查 Rubric YAML 文件是否包含 scale、aggregation、rubric 三个顶层键"
+  critical: true
+  check: "templates/gate-scripts/check_yaml_structure.py"
+  params:
+    required_keys:
+      - scale
+      - aggregation
+      - rubric
+  also_check: "templates/gate-scripts/check_rule_id_pattern.py"
+- id: gate4_path_validity
+  name: "配置路径有效性检查"
+  description: "检查 SSOT frontmatter 中 configs 引用的路径是否真实存在"
+  critical: false
+  check: "templates/gate-scripts/check_configs_paths.py"
+- id: gate5_required_gates
+  name: "必需Gate齐全检查"
+  description: "检查是否包含所有 universal gates 和 domain gates"
+  critical: true
+  check: "templates/gate-scripts/check_required_gates.py"
+  params:
+    required_gates:
+      universal:
+        - gate0_assets
+        - gate1_ssot_frontmatter
+        - gate2_gates_schema
+        - gate3_rubric_schema
+        - gate4_path_validity
+        - gate5_required_gates
+        - gate6_weight_sum
+        - gate7_eval_dataset
+        - gate8_universal_gates_unchanged
+      domain:
+        - gate10_trigger
+        - gate10_input
+        - gate10_behavior
+        - gate10_output
+        - gate10_acceptance
+- id: gate6_weight_sum
+  name: "权重总和校验"
+  description: "检查 Rubric 各维度权重之和是否在 [0.95, 1.05] 范围内"
+  critical: false
+  check: "templates/gate-scripts/check_rubric_weight_sum.py"
+  params:
+    tolerance: 0.05
+- id: gate7_eval_dataset
+  name: "评测数据集检查"
+  description: "检查评测数据集目录是否存在且包含至少3条用例"
+  critical: false
+  check: "templates/gate-scripts/check_eval_dataset.py"
+  params:
+    base_dir: "eval/recipe-generator/012-operation-procedure-generation"
+    min_cases: 3
+- id: gate8_universal_gates_unchanged
+  name: "通用Gates未被修改检查"
+  description: "检查 universal gates 的定义是否与基线一致，未被篡改"
+  critical: true
+  check: "templates/gate-scripts/check_universal_gates.py"
+- id: gate10_trigger
+  name: "触发器规则检查"
+  description: "检查触发器描述是否明确引用 WHEN + 上游规则 011"
+  critical: true
+  check: manual
+  params:
+    expected_trigger_ref: "011"
+- id: gate10_input
+  name: "输入字段检查"
+  description: "检查输入是否包含配方数据（原料、步骤、成品信息）"
+  critical: true
+  check: manual
+  params:
+    required_inputs:
+      - "原料列表"
+      - "操作步骤"
+      - "成品描述"
+- id: gate10_behavior
+  name: "行为规则检查（5阶段步骤+关键节点判断）"
+  description: "检查规则行为是否按5阶段组织步骤、每个关键节点有判断标准、错误步骤有避坑提示"
+  critical: true
+  check: manual
+  params:
+    expected_behaviors:
+      - "5阶段组织（备料、预处理、烹饪、调味、成品）"
+      - "关键节点判断标准"
+      - "错误避坑提示"
+- id: gate10_output
+  name: "输出模板检查"
+  description: "检查输出是否为5阶段操作流程模板，格式统一"
+  critical: true
+  check: manual
+  params:
+    expected_output_format: "5阶段操作流程模板"
+- id: gate10_acceptance
+  name: "验收标准检查"
+  description: "检查验收标准的各维度阈值"
+  critical: false
+  check: manual
+  params:
+    thresholds:
+      可操作性: 0.75
+      完整性: 0.75
+      避坑有效性: 0.75
+decision:
+  gate_pass_required: all_critical
+  failure_action: block
+  max_retry: 3
+  critical_gates:
+    - gate0_assets
+    - gate0_input_ssot_assets
+    - gate2_gates_schema
+    - gate3_rubric_schema
+    - gate5_required_gates
+    - gate8_universal_gates_unchanged
+    - gate10_trigger
+    - gate10_input
+    - gate10_behavior
+    - gate10_output

@@ -1,0 +1,99 @@
+---
+rule_id: "013-regional-taste-adaptation"
+version: "0.1.0"
+description: "地域口味适配 产出物Rubric评分表"
+---
+scale:
+  levels:
+    - id: none
+      value: 0.0
+      label: "无"
+    - id: weak
+      value: 0.25
+      label: "弱"
+    - id: partial
+      value: 0.50
+      label: "部分满足"
+    - id: good
+      value: 0.75
+      label: "良好"
+    - id: excellent
+      value: 1.0
+      label: "优秀"
+aggregation:
+  method: weighted_mean
+  dimension_min: 0.75
+  q_threshold: 0.85
+rubric:
+- key: adaptation_accuracy
+  name: "适配准确性"
+  weight: 0.45
+  checks:
+  - id: accuracy_parameter_reasonable
+    desc: "咸/辣/甜/麻/油各项调整是否符合目标地区口味特征"
+    evidence_from:
+      - "rules/013-regional-taste-adaptation.md:口味参数调整"
+    levels:
+      0.0: "调整方向完全错误，与目标地区口味特征相悖"
+      0.25: "仅1-2个参数调整方向正确，多数调整有误"
+      0.50: "约半数参数调整方向正确，部分参数未调整或调整不当"
+      0.75: "绝大多数参数调整方向正确，符合目标地区口味特征"
+      1.0: "所有参数调整精准匹配目标地区口味特征，调整幅度合理恰当"
+  - id: accuracy_amplitude_moderate
+    desc: "单参数调整幅度是否在合理范围内，未过度扭曲原配方"
+    evidence_from:
+      - "rules/013-regional-taste-adaptation.md:调整幅度"
+    levels:
+      0.0: "调整幅度极端（≥80%变化），原配方风味被完全颠覆"
+      0.25: "多个参数调整幅度过大（>50%变化），原配方面目全非"
+      0.50: "个别参数调整幅度偏大，但整体尚可接受"
+      0.75: "所有参数调整幅度控制在合理范围（≤50%），原配方基础风味得以保留"
+      1.0: "调整幅度精准控制在保留本味与适配口味的最佳平衡点"
+- key: coverage
+  name: "覆盖度"
+  weight: 0.30
+  checks:
+  - id: coverage_regions
+    desc: "是否支持国内主要饮食区域及海外主要华人聚集地"
+    evidence_from:
+      - "rules/013-regional-taste-adaptation.md:地域分类"
+    levels:
+      0.0: "不支持地域分类，无地区知识库"
+      0.25: "仅支持1-2个区域，覆盖严重不足"
+      0.50: "支持3-4个主要区域，部分区域缺失"
+      0.75: "覆盖国内主要饮食区域（华北、华东、华南、西南等），海外覆盖不足"
+      1.0: "全面覆盖国内七大饮食区域及海外主要华人聚集地"
+  - id: coverage_parameters
+    desc: "5个口味参数（咸/辣/甜/麻/油）是否均被考虑"
+    evidence_from:
+      - "rules/013-regional-taste-adaptation.md:口味参数"
+    levels:
+      0.0: "仅考虑1个口味参数"
+      0.25: "仅考虑2个口味参数"
+      0.50: "考虑了3-4个口味参数"
+      0.75: "5个口味参数均被考虑，但个别参数调整粒度较粗"
+      1.0: "5个口味参数均被细致考虑，调整有明确的分级依据"
+- key: explainability
+  name: "可解释性"
+  weight: 0.25
+  checks:
+  - id: explainability_reason_clear
+    desc: "每项调整是否附带了清晰易懂的原因说明"
+    evidence_from:
+      - "rules/013-regional-taste-adaptation.md:调整原因"
+    levels:
+      0.0: "无任何调整原因说明"
+      0.25: "仅有少量调整附带原因说明，且表述模糊"
+      0.50: "约半数调整有原因说明，部分说明较笼统"
+      0.75: "绝大多数调整附带清晰原因说明，用户能理解调整依据"
+      1.0: "每项调整均有通俗易懂的原因说明，用户不仅知道'改了什么'还明白'为什么这样改'"
+  - id: explainability_suggestion_graded
+    desc: "是否对调整建议做了分级（必须/建议/可选）"
+    evidence_from:
+      - "rules/013-regional-taste-adaptation.md:建议分级"
+    levels:
+      0.0: "无分级，所有调整均为强制要求"
+      0.25: "仅有简单的分级标签，无实质区分"
+      0.50: "部分调整有分级，但分级逻辑不清晰"
+      0.75: "多数调整有合理分级（必须/建议/可选），用户有选择空间"
+      1.0: "所有调整均清晰分级并附理由，用户可在了解后果的前提下自主选择"

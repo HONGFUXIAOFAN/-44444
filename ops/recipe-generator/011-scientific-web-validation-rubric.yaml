@@ -1,0 +1,159 @@
+---
+rule_id: scientific-web-validation
+version: 0.1.0
+description: 科学性联网验证产出物Rubric评分
+---
+scale:
+  levels:
+  - label: none
+    points: 0.0
+    hint: 完全缺失，该维度未涉及任何内容
+  - label: weak
+    points: 0.25
+    hint: 严重不足，仅有粗略提及但无实质定义
+  - label: partial
+    points: 0.5
+    hint: 部分满足，有基本框架但细节不完整
+  - label: good
+    points: 0.75
+    hint: 基本满足，主体内容完整且可用
+  - label: excellent
+    points: 1.0
+    hint: 完全满足，定义精确且覆盖所有边界场景
+aggregation:
+  method: weighted_mean
+  dimension_min: 0.75
+  q_threshold: 0.85
+rubric:
+- key: validation_depth
+  name: 验证深度
+  weight: 0.40
+  checks:
+  - id: vd_dimension_coverage
+    desc: 是否覆盖四个验证维度
+    evidence_from:
+    - rules/scientific-web-validation.md:产出物定义
+    levels:
+      0.0: 未定义任何验证维度
+      0.25: 仅覆盖1个验证维度
+      0.5: 覆盖2个验证维度
+      0.75: 覆盖3个验证维度（原料种类/用量比例/温度时间/安全性）
+      1.0: 完整覆盖四个维度且有明确的每个维度的验证标准
+  - id: vd_ingredient_validation
+    desc: 原料种类验证的深度
+    evidence_from:
+    - rules/scientific-web-validation.md:产出物定义
+    - rules/scientific-web-validation.md:Commonness
+    levels:
+      0.0: 无原料验证
+      0.25: 仅检查原料列表非空
+      0.5: 检查原料是否为常见组合
+      0.75: 检查常见组合+关键原料缺失+危险搭配
+      1.0: 完整检查：常见组合+关键原料缺失+禁忌搭配+过敏标注+营养平衡
+  - id: vd_quantity_validation
+    desc: 用量比例验证的深度
+    evidence_from:
+    - rules/scientific-web-validation.md:产出物定义
+    - rules/scientific-web-validation.md:Technique
+    levels:
+      0.0: 无用量的验证
+      0.25: 仅检查用量非零
+      0.5: 检查是否在安全范围内
+      0.75: 检查是否在行业基准范围内并对偏差给出说明
+      1.0: 完整检查：基准范围对比+偏差分析+来源一致性评分+建议修正值
+  - id: vd_temp_time_validation
+    desc: 温度时间验证的深度
+    evidence_from:
+    - rules/scientific-web-validation.md:产出物定义
+    - rules/scientific-web-validation.md:Commonness
+    levels:
+      0.0: 无温度时间的验证
+      0.25: 仅检查温度时间字段存在
+      0.5: 检查温度是否达到食品安全标准
+      0.75: 检查温度/时长是否符合行业基准且标注偏差
+      1.0: 完整检查：食品安全标准+行业基准+偏差分析+科学解释
+  - id: vd_safety_validation
+    desc: 安全性验证的深度
+    evidence_from:
+    - rules/scientific-web-validation.md:产出物定义
+    - rules/scientific-web-validation.md:Commonness
+    levels:
+      0.0: 无安全性验证
+      0.25: 仅检查明显的禁忌
+      0.5: 检查食材禁忌搭配
+      0.75: 检查禁忌搭配+过敏风险+食品安全温度
+      1.0: 完整检查：禁忌搭配+过敏原+食品安全温度+交叉污染风险+保存建议
+- key: source_reliability
+  name: 来源可靠性
+  weight: 0.35
+  checks:
+  - id: sr_source_count
+    desc: 是否使用至少2个独立来源进行交叉验证
+    evidence_from:
+    - rules/scientific-web-validation.md:Technique
+    - rules/scientific-web-validation.md:产出物定义
+    levels:
+      0.0: 无来源引用
+      0.25: 仅引用1个来源
+      0.5: 引用2个来源但可能同源
+      0.75: 引用至少2个独立来源
+      1.0: 引用3个及以上独立来源进行三角验证
+  - id: sr_authority_scoring
+    desc: 来源权威性是否被评估
+    evidence_from:
+    - rules/scientific-web-validation.md:Technique
+    - rules/scientific-web-validation.md:Commonness
+    levels:
+      0.0: 无权威性评估
+      0.25: 仅区分专业/非专业来源
+      0.5: 有简单的权威性分类
+      0.75: 有权威性评分模型（域名信誉/内容专业度/引用量）
+      1.0: 完整权威性评分模型+来源可信度透明标注+评分依据可查
+  - id: sr_cross_platform
+    desc: 是否跨平台搜索以增强来源多样性
+    evidence_from:
+    - rules/scientific-web-validation.md:Technique
+    - rules/scientific-web-validation.md:Commonness
+    levels:
+      0.0: 未提及平台多样性
+      0.25: 仅从单一类型平台获取
+      0.5: 从至少两类平台获取来源
+      0.75: 从多种平台类型获取且有平台多样性评估
+      1.0: 系统性的跨平台搜索策略，覆盖专业美食/食谱/食品安全等多种平台
+- key: transparency
+  name: 透明度
+  weight: 0.25
+  checks:
+  - id: tr_process_traceability
+    desc: 验证过程是否可追溯
+    evidence_from:
+    - rules/scientific-web-validation.md:Art
+    - rules/scientific-web-validation.md:产出物定义
+    levels:
+      0.0: 验证过程不透明，仅输出结论
+      0.25: 有最终结论但过程不清晰
+      0.5: 有基本的过程记录但细节不足
+      0.75: 验证过程可追溯，包含来源URL和关键数据
+      1.0: 完整追溯链：搜索关键词+来源URL+提取数据+对比过程+结论推导
+  - id: tr_discrepancy_explanation
+    desc: 不一致项是否有充分解释
+    evidence_from:
+    - rules/scientific-web-validation.md:产出物定义
+    - rules/scientific-web-validation.md:Art
+    levels:
+      0.0: 未标注不一致项
+      0.25: 列出了不一致项但无解释
+      0.5: 有简单解释但缺少差异幅度
+      0.75: 标注了差异幅度、可能原因、建议取值
+      1.0: 完整解释：差异幅度+原因分析（地域/流派/版本差异）+建议+置信度
+  - id: tr_confidence_derivation
+    desc: 置信度是否有明确的计算依据
+    evidence_from:
+    - rules/scientific-web-validation.md:Technique
+    - rules/scientific-web-validation.md:产出物定义
+    levels:
+      0.0: 无置信度或武断给定
+      0.25: 有置信度但无计算依据
+      0.5: 有简单的计算说明但不完整
+      0.75: 置信度有计算公式（来源数×一致性×权威性）
+      1.0: 完整置信度模型：分维度置信度+整体置信度+计算公式+各因子具体取值

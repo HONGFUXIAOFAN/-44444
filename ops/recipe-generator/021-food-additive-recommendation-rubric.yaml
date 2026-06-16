@@ -1,0 +1,92 @@
+---
+rule_id: "021-food-additive-recommendation"
+version: "0.1.0"
+description: "021-添加剂合理推荐 产出物Rubric评分标准——安全性(0.50)/可操作性(0.25)/完整性(0.25)"
+---
+scale:
+  levels:
+    - "none(0.0)"
+    - "weak(0.25)"
+    - "partial(0.5)"
+    - "good(0.75)"
+    - "excellent(1.0)"
+aggregation:
+  method: "weighted_mean"
+  dimension_min: 0.75
+  q_threshold: 0.85
+rubric:
+- key: "safety"
+  name: "安全性"
+  weight: 0.50
+  checks:
+  - id: "safety_gb2760_compliance"
+    desc: "所有推荐添加剂在GB 2760-2024合法范围内"
+    evidence_from:
+      - "rules/021-food-additive-recommendation.md:步骤2 联网验证合规性"
+      - "rules/021-food-additive-recommendation.md:规则约束 安全红线"
+    levels:
+      0.0: "推荐的添加剂中至少1种不在GB 2760-2024范围内"
+      0.25: "添加剂在GB 2760范围内，但存在用量超过最大使用量的情况"
+      0.50: "添加剂合规且用量不超量，但未标注法规依据具体条款"
+      0.75: "添加剂合规且用量安全，法规依据标注完整，但遗漏个别禁忌人群或禁忌器具"
+      1.0: "所有推荐100%合规，用量在安全范围内，法规依据/禁忌人群/禁忌器具/存储条件全部完整标注"
+  - id: "safety_redline_check"
+    desc: "安全红线完整：无禁用品种、无超量、无违规场景推荐"
+    evidence_from:
+      - "rules/021-food-additive-recommendation.md:规则约束 安全红线（绝对禁止）"
+      - "rules/021-food-additive-recommendation.md:六、护色剂/抗氧化剂"
+    levels:
+      0.0: "推荐了脱氢乙酸钠用于面包/糕点等禁用场景，或推荐了工业级添加剂"
+      0.25: "未推荐禁用品种，但亚硝酸钠推荐未要求搭配D-异抗坏血酸钠"
+      0.50: "安全红线基本遵守，但遗漏了部分2024新规（如未标注罐头不得使用防腐剂）"
+      0.75: "安全红线完整，亚硝酸盐有条件限定（精确称量+复配），但未标注小餐饮不建议使用"
+      1.0: "安全红线100%完整：所有禁止项明确、亚硝酸盐有精确称量条件及替代方案、2024新规全面覆盖"
+- key: "operability"
+  name: "可操作性"
+  weight: 0.25
+  checks:
+  - id: "operability_dosage_precision"
+    desc: "用量精确标注，使用方法步进清晰"
+    evidence_from:
+      - "rules/021-food-additive-recommendation.md:步骤4 生成添加剂推荐卡"
+      - "rules/021-food-additive-recommendation.md:步骤3 按五维增味体系生成推荐"
+    levels:
+      0.0: "用量以模糊词汇描述（如少许、适量），无具体克数"
+      0.25: "有g/kg标注但无本配方具体用量换算，使用方法仅一句话概括"
+      0.50: "g/kg和本配方用量均有，但使用方法缺少温度/时机/器具要求"
+      0.75: "用量双标注清晰，使用方法含温度和时机，但遗漏协同效应说明"
+      1.0: "用量双标注完整，使用方法步进清晰（含温度/时机/器具），协同效应有对比说明，黄金配比按菜品类型覆盖完整"
+  - id: "operability_golden_ratio"
+    desc: "按菜品类型给出五维增味体系黄金配比"
+    evidence_from:
+      - "rules/021-food-additive-recommendation.md:步骤3 按五维增味体系生成推荐"
+    levels:
+      0.0: "未按菜品类型区分，直接推荐同一种方案"
+      0.25: "按菜品类型区分了但只有1-2种类型"
+      0.50: "覆盖3-4种菜品类型但黄金配比不完整（只给出比例无总量建议）"
+      0.75: "覆盖全部5种菜品类型但部分配比缺少可选升级方案"
+      1.0: "5种菜品类型全覆盖，每种有黄金配比+建议总量+可选升级方案，五维逻辑清晰可循"
+- key: "completeness"
+  name: "完整性"
+  weight: 0.25
+  checks:
+  - id: "completeness_safety_card"
+    desc: "添加剂安全卡内容完整"
+    evidence_from:
+      - "rules/021-food-additive-recommendation.md:步骤4 生成添加剂推荐卡"
+    levels:
+      0.0: "无添加剂推荐卡模板或仅列出名称无安全信息"
+      0.25: "有安全卡但缺少CNS/INS编号、作用说明等基本信息"
+      0.50: "安全卡基本信息完整但缺少安全档案（ADI/LD50/法规依据）"
+      0.75: "安全卡完整但缺少使用建议或配方修正对照表（涉及修改时）"
+      1.0: "安全卡100%完整：基本信息+精确用量+使用方法+注意事项+安全档案+使用建议+配方修正对照表（如需）"
+  - id: "completeness_no_recommend_handling"
+    desc: "不推荐场景的处理方案完整"
+    evidence_from:
+      - "rules/021-food-additive-recommendation.md:步骤5 不推荐的处理"
+    levels:
+      0.0: "传统工艺可达成风味时仍强行推荐添加剂"
+      0.25: "判断了不推荐但未给出替代方案路径"
+      0.50: "给出了不推荐说明但替代方案过于笼统无具体品类"
+      0.75: "替代方案有具体品类但缺少按需求对照的建议表"
+      1.0: "不推荐判断优先于推荐，有清晰的判断原则，每条不推荐附带按需求分类的替代方案表"

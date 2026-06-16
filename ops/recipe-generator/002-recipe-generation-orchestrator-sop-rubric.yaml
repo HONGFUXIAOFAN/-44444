@@ -1,0 +1,133 @@
+---
+rule_id: recipe-generation-orchestrator-sop
+version: 0.1.0
+description: 配方生成总控SOP产出物Rubric评分
+---
+scale:
+  levels:
+  - label: none
+    points: 0.0
+    hint: 完全缺失，该维度未涉及任何内容
+  - label: weak
+    points: 0.25
+    hint: 严重不足，仅有粗略提及但无实质定义
+  - label: partial
+    points: 0.5
+    hint: 部分满足，有基本框架但细节不完整
+  - label: good
+    points: 0.75
+    hint: 基本满足，主体内容完整且可用
+  - label: excellent
+    points: 1.0
+    hint: 完全满足，定义精确且覆盖所有边界场景
+aggregation:
+  method: weighted_mean
+  dimension_min: 0.75
+  q_threshold: 0.85
+rubric:
+- key: completeness
+  name: 完整性
+  weight: 0.40
+  checks:
+  - id: cmp_step_coverage
+    desc: 是否覆盖所有配方生成所需步骤
+    evidence_from:
+    - rules/recipe-generation-orchestrator-sop.md:产出物定义
+    levels:
+      0.0: 未列出任何步骤
+      0.25: 仅列出1-2个步骤，大量步骤缺失
+      0.5: 列出了大部分步骤但有明显遗漏
+      0.75: 覆盖了输入解析、参数生成、验证、步骤生成、最终组装五个核心步骤
+      1.0: 覆盖所有步骤且包含扩展点预留
+  - id: cmp_dependency_graph
+    desc: 步骤间的依赖关系是否完整和正确
+    evidence_from:
+    - rules/recipe-generation-orchestrator-sop.md:Technique
+    - rules/recipe-generation-orchestrator-sop.md:产出物定义
+    levels:
+      0.0: 无依赖关系定义
+      0.25: 仅口头描述了依赖但无结构化定义
+      0.5: 列出了部分依赖关系但有错误
+      0.75: 依赖关系完整且正确（DAG无环）
+      1.0: 依赖关系完整正确且有依赖图/矩阵形式的可视化
+  - id: cmp_data_contract
+    desc: 是否定义了每个子规则的输入输出数据契约
+    evidence_from:
+    - rules/recipe-generation-orchestrator-sop.md:Technique
+    levels:
+      0.0: 无数据契约定义
+      0.25: 提及数据契约但未定义
+      0.5: 定义了部分子规则的输入输出
+      0.75: 定义了所有主要子规则的输入输出schema
+      1.0: 所有子规则有完整的输入输出schema定义且包含校验规则
+- key: operability
+  name: 可操作性
+  weight: 0.35
+  checks:
+  - id: op_trigger_conditions
+    desc: 每个编排步骤是否有明确的触发条件
+    evidence_from:
+    - rules/recipe-generation-orchestrator-sop.md:产出物定义
+    - rules/recipe-generation-orchestrator-sop.md:Technique
+    levels:
+      0.0: 无触发条件定义
+      0.25: 仅有顺序执行描述，无明确触发条件
+      0.5: 部分步骤有触发条件
+      0.75: 每个步骤有明确的触发前置条件
+      1.0: 每个步骤有触发条件、超时处理、跳过条件
+  - id: op_parallel_execution
+    desc: 并行执行策略是否明确可执行
+    evidence_from:
+    - rules/recipe-generation-orchestrator-sop.md:Technique
+    levels:
+      0.0: 未考虑并行执行
+      0.25: 提及可并行但未指定哪些步骤
+      0.5: 标识了可并行步骤但无并行策略细节
+      0.75: 明确标识了可并行步骤和有并行执行机制描述
+      1.0: 清晰的并行分组、同步点定义、资源限制策略
+  - id: op_user_interaction
+    desc: 用户确认节点的交互设计是否可操作
+    evidence_from:
+    - rules/recipe-generation-orchestrator-sop.md:Technique
+    - rules/recipe-generation-orchestrator-sop.md:Art
+    levels:
+      0.0: 无用户交互设计
+      0.25: 提及需要确认但未定义节点
+      0.5: 定义了确认节点但交互细节不清晰
+      0.75: 定义了确认节点、确认内容、超时处理
+      1.0: 完整的确认交互设计，含超时、默认选择、进度提示
+- key: robustness
+  name: 鲁棒性
+  weight: 0.25
+  checks:
+  - id: rb_error_recovery
+    desc: 异常处理与错误恢复策略是否完备
+    evidence_from:
+    - rules/recipe-generation-orchestrator-sop.md:Technique
+    - rules/recipe-generation-orchestrator-sop.md:Art
+    levels:
+      0.0: 无异常处理
+      0.25: 仅提及需要错误处理但无具体策略
+      0.5: 定义了基本重试策略
+      0.75: 定义了重试策略、降级方案、人工干预入口
+      1.0: 完整的异常处理体系：重试/降级/补偿/人工干预/日志追踪
+  - id: rb_cascade_failure
+    desc: 级联失败的处理机制
+    evidence_from:
+    - rules/recipe-generation-orchestrator-sop.md:Technique
+    levels:
+      0.0: 未考虑级联失败
+      0.25: 提及级联影响但无处理策略
+      0.5: 定义了基本的依赖中断检测
+      0.75: 定义了依赖中断后的下游处理策略
+      1.0: 完整的级联失败处理：检测/隔离/降级/恢复/通知
+  - id: rb_state_management
+    desc: 流程状态管理与执行追踪是否可靠
+    evidence_from:
+    - rules/recipe-generation-orchestrator-sop.md:产出物定义
+    levels:
+      0.0: 无状态管理
+      0.25: 提及执行日志但无具体设计
+      0.5: 定义了基本的流程状态
+      0.75: 定义了完整的状态机模型和日志记录
+      1.0: 完整的状态机 + 持久化执行日志 + 恢复重放能力

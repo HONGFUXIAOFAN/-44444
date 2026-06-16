@@ -1,0 +1,136 @@
+---
+rule_id: input-parse-sop
+version: 0.1.0
+description: 输入解析SOP产出物Rubric评分
+---
+scale:
+  levels:
+  - label: none
+    points: 0.0
+    hint: 完全缺失，该维度未涉及任何内容
+  - label: weak
+    points: 0.25
+    hint: 严重不足，仅有粗略提及但无实质定义
+  - label: partial
+    points: 0.5
+    hint: 部分满足，有基本框架但细节不完整
+  - label: good
+    points: 0.75
+    hint: 基本满足，主体内容完整且可用
+  - label: excellent
+    points: 1.0
+    hint: 完全满足，定义精确且覆盖所有边界场景
+aggregation:
+  method: weighted_mean
+  dimension_min: 0.75
+  q_threshold: 0.85
+rubric:
+- key: systematicity
+  name: 系统性
+  weight: 0.35
+  checks:
+  - id: sys_coverage
+    desc: 解析流程是否完整覆盖所有输入形态
+    evidence_from:
+    - rules/input-parse-sop.md:产出物定义
+    - rules/input-parse-sop.md:思考与规划
+    levels:
+      0.0: 未提及输入形态分类
+      0.25: 仅提及正常输入一种形态
+      0.5: 覆盖了完整输入和部分缺失两种情况
+      0.75: 覆盖完整/缺失/歧义三种形态
+      1.0: 覆盖完整/缺失/歧义/模糊/对抗五种及以上输入形态
+  - id: sys_field_normalization
+    desc: 菜品名称、地区、场景的标准化映射是否有清晰定义
+    evidence_from:
+    - rules/input-parse-sop.md:Commonness
+    - rules/input-parse-sop.md:Technique
+    levels:
+      0.0: 无标准化定义
+      0.25: 仅提及标准化概念但无具体方法
+      0.5: 定义了别名映射表或等价规则中的一项
+      0.75: 定义了别名映射表和地区-口味关联表
+      1.0: 完整定义了别名映射表、地区-口味关联表、场景分类体系
+  - id: sys_confidence
+    desc: 是否定义了每个解析字段的置信度评估机制
+    evidence_from:
+    - rules/input-parse-sop.md:产出物定义
+    - rules/input-parse-sop.md:Technique
+    levels:
+      0.0: 未提及置信度
+      0.25: 产出物中定义了parse_meta但未说明计算方式
+      0.5: parse_meta有基本结构但置信度计算不明确
+      0.75: 定义了每个字段的置信度评分规则
+      1.0: 完整定义了置信度评分、阈值、低置信度降级策略
+- key: operability
+  name: 可操作性
+  weight: 0.35
+  checks:
+  - id: op_step_definition
+    desc: 每个解析步骤是否有明确的输入-处理-输出定义
+    evidence_from:
+    - rules/input-parse-sop.md:Technique
+    - rules/input-parse-sop.md:产出物定义
+    levels:
+      0.0: 无步骤定义
+      0.25: 仅有概括性描述，无分步说明
+      0.5: 列出了解析步骤但部分步骤缺少输入输出定义
+      0.75: 每个步骤有清晰的输入-处理-输出，粒度基本合理
+      1.0: 步骤粒度合理，输入输出schema明确，可直接编程实现
+  - id: op_fallback
+    desc: 缺失字段的推断与默认值填充机制是否可操作
+    evidence_from:
+    - rules/input-parse-sop.md:Technique
+    - rules/input-parse-sop.md:Commonness
+    levels:
+      0.0: 无缺失字段处理
+      0.25: 仅提及需要有默认值但未定义规则
+      0.5: 定义了部分字段的默认值规则
+      0.75: 定义了全部字段的默认值规则及推断逻辑
+      1.0: 完整定义了默认值规则、推断优先级、人工确认触发条件
+  - id: op_output_schema
+    desc: 输出schema是否定义清晰可直接消费
+    evidence_from:
+    - rules/input-parse-sop.md:产出物定义
+    levels:
+      0.0: 无输出定义
+      0.25: 仅口头描述输出内容
+      0.5: 给出了字段列表但未说明类型和格式
+      0.75: 给出了字段列表、类型、示例值
+      1.0: 给出了完整的JSON schema或等价定义，含必填/可选、取值范围
+- key: practicality
+  name: 实用性
+  weight: 0.30
+  checks:
+  - id: pr_downstream_compatibility
+    desc: 解析结果是否可直接被下游规则消费
+    evidence_from:
+    - rules/input-parse-sop.md:产出物定义
+    - rules/input-parse-sop.md:downstream_consumers
+    levels:
+      0.0: 未考虑下游消费
+      0.25: 提及下游但输出格式不匹配下游需求
+      0.5: 输出与部分下游规则的输入schema对齐
+      0.75: 输出与所有列出的下游规则的输入schema对齐
+      1.0: 输出与下游schema完全对齐且包含兼容性注释
+  - id: pr_edge_cases
+    desc: 边界case处理是否合理
+    evidence_from:
+    - rules/input-parse-sop.md:Art
+    - rules/input-parse-sop.md:评测数据集
+    levels:
+      0.0: 无边界case处理
+      0.25: 提及需要处理边界但无具体方案
+      0.5: 处理了明显的边界case（如空输入）
+      0.75: 处理了常见边界case并有具体策略
+      1.0: 覆盖了评测数据集中所有边界case并有明确的处理策略
+  - id: pr_user_experience
+    desc: 解析过程是否透明可解释
+    evidence_from:
+    - rules/input-parse-sop.md:Art
+    levels:
+      0.0: 无用户体验考量
+      0.25: 提及用户体验但无具体设计
+      0.5: 设计了基本的确认提示
+      0.75: 输出包含可解释的解析过程信息
+      1.0: 解析过程完全透明，用户可查看系统如何理解其输入并可修正

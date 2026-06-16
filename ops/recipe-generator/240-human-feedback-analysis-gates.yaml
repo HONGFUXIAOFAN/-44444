@@ -1,0 +1,147 @@
+---
+rule_id: "240-human-feedback-analysis"
+version: "0.1.0"
+description: "240-人类反馈RCA根因分析 产出物Gates检查"
+phase: "building"
+---
+context:
+  purpose: "检查240-人类反馈RCA根因分析规则的产出物是否符合质量门禁标准，确保SSOT/Gates/Rubric三件套完整、结构合规、路径有效"
+  scope: "ssot/recipe-generator/240-human-feedback-analysis-ssot.md, ops/recipe-generator/240-human-feedback-analysis-gates.yaml, ops/recipe-generator/240-human-feedback-analysis-rubric.yaml, rules/240-human-feedback-analysis.md"
+  consumer: "ssot-judge、Administrator"
+gates:
+- id: "gate0_assets"
+  name: "三件套存在检查"
+  desc: "确认SSOT文件、Gates文件、Rubric文件全部存在"
+  check: "check_file_paths.py"
+  params:
+    p1: "ssot/recipe-generator/240-human-feedback-analysis-ssot.md"
+    p2: "ops/recipe-generator/240-human-feedback-analysis-gates.yaml"
+    p3: "ops/recipe-generator/240-human-feedback-analysis-rubric.yaml"
+  critical: true
+- id: "gate0_input_ssot_assets"
+  name: "三件套存在检查(alias)"
+  desc: "同上，确认三件套存在"
+  check: "check_file_paths.py"
+  params:
+    p1: "ssot/recipe-generator/240-human-feedback-analysis-ssot.md"
+    p2: "ops/recipe-generator/240-human-feedback-analysis-gates.yaml"
+    p3: "ops/recipe-generator/240-human-feedback-analysis-rubric.yaml"
+  critical: true
+- id: "gate1_ssot_frontmatter"
+  name: "SSOT YAML头完整性检查"
+  desc: "确认SSOT文件YAML frontmatter包含必填字段: name, version, description, applies_to, deliverable_vision, configs"
+  check: "check_yaml_structure.py"
+  params:
+    target: "ssot/recipe-generator/240-human-feedback-analysis-ssot.md"
+    required_fields:
+      - "name"
+      - "version"
+      - "description"
+      - "applies_to"
+      - "deliverable_vision"
+      - "configs"
+  critical: false
+- id: "gate2_gates_schema"
+  name: "Gates文件结构校验"
+  desc: "确认Gates YAML文件包含必选字段: context, gates, decision"
+  check: "check_yaml_structure.py"
+  params:
+    target: "ops/recipe-generator/240-human-feedback-analysis-gates.yaml"
+    required_fields:
+      - "context"
+      - "gates"
+      - "decision"
+  critical: true
+- id: "gate3_rubric_schema"
+  name: "Rubric文件结构校验"
+  desc: "确认Rubric YAML文件包含必选字段: scale, aggregation, rubric"
+  check: "check_yaml_structure.py"
+  params:
+    target: "ops/recipe-generator/240-human-feedback-analysis-rubric.yaml"
+    required_fields:
+      - "scale"
+      - "aggregation"
+      - "rubric"
+  critical: true
+- id: "gate4_path_validity"
+  name: "configs路径有效性检查"
+  desc: "确认SSOT中configs路径指向的文件真实存在"
+  check: "check_configs_paths.py"
+  critical: false
+- id: "gate5_required_gates"
+  name: "必选Gate存在检查"
+  desc: "确认所有必选gate ID均已定义"
+  check: "check_required_gates.py"
+  params:
+    required_gates:
+      - "gate0_assets"
+      - "gate1_ssot_frontmatter"
+      - "gate2_gates_schema"
+      - "gate3_rubric_schema"
+      - "gate4_path_validity"
+      - "gate5_required_gates"
+      - "gate6_weight_sum"
+      - "gate7_eval_dataset"
+      - "gate8_universal_gates_unchanged"
+      - "gate10_trigger"
+      - "gate10_input"
+      - "gate10_behavior"
+      - "gate10_output"
+      - "gate10_acceptance"
+  critical: true
+- id: "gate6_weight_sum"
+  name: "Rubric权重总和检查"
+  desc: "确认Rubric维度权重总和接近1.0（容差0.05）"
+  check: "check_rubric_weight_sum.py"
+  params:
+    target: "ops/recipe-generator/240-human-feedback-analysis-rubric.yaml"
+    tolerance: 0.05
+  critical: false
+- id: "gate7_eval_dataset"
+  name: "评测数据集检查"
+  desc: "确认评测数据集目录存在且至少包含3条用例"
+  check: "check_eval_dataset.py"
+  params:
+    base_dir: "eval/recipe-generator/240-human-feedback-analysis"
+    min_cases: 3
+  critical: false
+- id: "gate8_universal_gates_unchanged"
+  name: "通用Gate未修改检查"
+  desc: "确认gate0-gate8通用gate定义与标准模板一致，未被篡改"
+  check: "check_universal_gates.py"
+  critical: true
+- id: "gate10_trigger"
+  name: "领域触发器检查"
+  desc: "确认触发器条件匹配: 用户对已生成的配方方案提出反馈意见时"
+  critical: true
+- id: "gate10_input"
+  name: "领域输入检查"
+  desc: "确认输入要素完整: 用户反馈原文 + 涉及产出物（配方方案文档/规则产出物）+ 涉及规则文件（可选）"
+  critical: true
+- id: "gate10_behavior"
+  name: "领域行为检查"
+  desc: "确认行为逻辑完整: 步骤0思考与规划（向用户汇报等待确认） -> 步骤1问题定义 -> 步骤2证据收集 -> 步骤3根因识别（5-Whys） -> 步骤4改进建议 -> 步骤5执行改进"
+  critical: true
+- id: "gate10_output"
+  name: "领域输出检查"
+  desc: "确认输出物完整: 反馈分析报告（问题定义+证据+根因+建议）+ 改进执行记录"
+  critical: true
+- id: "gate10_acceptance"
+  name: "领域验收检查"
+  desc: "确认验收标准: 根因分析有据可查 + 改进建议可执行 + 用户确认分析结果后才执行修改 + 每条反馈独立分析"
+  critical: false
+decision:
+  gate_pass_required: "all_critical"
+  failure_action: "block"
+  max_retry: 3
+  critical_gates:
+    - "gate0_assets"
+    - "gate0_input_ssot_assets"
+    - "gate2_gates_schema"
+    - "gate3_rubric_schema"
+    - "gate5_required_gates"
+    - "gate8_universal_gates_unchanged"
+    - "gate10_trigger"
+    - "gate10_input"
+    - "gate10_behavior"
+    - "gate10_output"

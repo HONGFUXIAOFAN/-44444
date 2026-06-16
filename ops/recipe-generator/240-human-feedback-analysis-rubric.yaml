@@ -1,0 +1,91 @@
+---
+rule_id: "240-human-feedback-analysis"
+version: "0.1.0"
+description: "240-人类反馈RCA根因分析 产出物Rubric评分标准——分析深度(0.40)/改进可行性(0.35)/反馈闭环(0.25)"
+---
+scale:
+  levels:
+    - "none(0.0)"
+    - "weak(0.25)"
+    - "partial(0.5)"
+    - "good(0.75)"
+    - "excellent(1.0)"
+aggregation:
+  method: "weighted_mean"
+  dimension_min: 0.75
+  q_threshold: 0.85
+rubric:
+- key: "analysis_depth"
+  name: "分析深度"
+  weight: 0.40
+  checks:
+  - id: "depth_5whys"
+    desc: "5-Whys逐层递进至少3层，区分症状与根因"
+    evidence_from:
+      - "rules/240-human-feedback-analysis.md:步骤3 根因识别"
+    levels:
+      0.0: "无5-Whys分析，仅描述了用户反馈的问题表象"
+      0.25: "有5-Whys追问但不足3层，停留在浅层原因（如'因为没按规则执行'）"
+      0.50: "3层Why追问完成但症状与根因区分不够清晰，根因分类不准确"
+      0.75: "3层+逐层追问清晰，症状与根因区分明确，根因分类准确（规则设计缺陷/执行偏差/需求未对齐/外部信息不足）"
+      1.0: "每层Why有推理逻辑说明，症状-根因边界清晰，根因分类准确且有证据支撑，分析结论可经第三方复核成立"
+  - id: "depth_evidence"
+    desc: "所有结论基于证据，引用原文支撑"
+    evidence_from:
+      - "rules/240-human-feedback-analysis.md:步骤2 证据收集"
+    levels:
+      0.0: "结论无任何证据引用，纯主观推测"
+      0.25: "部分结论有证据但关键判断依赖推测（如'可能是AI杜撰'无方案原文定位）"
+      0.50: "每条结论有引用但仅引用用户反馈原文，未定位方案中的问题段落"
+      0.75: "用户反馈原文+方案问题段落均有引用但缺少与规则要求的对照"
+      1.0: "三重证据完整：用户反馈原文完整引用 + 方案中问题段落精确定位 + 相关规则要求逐条对照，结论与证据一一对应"
+- key: "improvement_feasibility"
+  name: "改进可行性"
+  weight: 0.35
+  checks:
+  - id: "feasibility_actionable"
+    desc: "改进建议具体可执行，含涉及文件+步骤+验收标准"
+    evidence_from:
+      - "rules/240-human-feedback-analysis.md:步骤4 改进建议"
+    levels:
+      0.0: "改进建议仅为方向性口号（如'后续改进配方生成质量'）"
+      0.25: "有具体改进方向但未明确涉及文件或规则ID"
+      0.50: "涉及文件和规则ID明确但改进步骤过于简略（如'修改010规则'无具体改动点）"
+      0.75: "改进步骤分步清晰但缺少可量化的验收标准"
+      1.0: "改进建议完整可执行：改进方向+涉及文件/规则ID+分步操作说明+可量化验收标准，实施者无需额外判断即可执行"
+  - id: "feasibility_impact_assessment"
+    desc: "改进方案评估了下游影响"
+    evidence_from:
+      - "rules/240-human-feedback-analysis.md:步骤4 改进建议"
+      - "AGENTS.md:四、工作流 异常处理"
+    levels:
+      0.0: "未评估改进对下游规则的影响"
+      0.25: "提到了会影响下游但未具体到哪些规则"
+      0.50: "下游影响评估有规则列表但未说明影响方式和程度"
+      0.75: "下游影响评估完整但缺少回退后重新执行的流程说明"
+      1.0: "完整的下游影响评估：受影响规则清单+影响方式+影响程度+回退后重新执行流程+受影响项重新审查范围"
+- key: "feedback_loop"
+  name: "反馈闭环"
+  weight: 0.25
+  checks:
+  - id: "loop_independent_analysis"
+    desc: "每条反馈独立分析，逐条处理，不合并"
+    evidence_from:
+      - "rules/240-human-feedback-analysis.md:规则约束"
+    levels:
+      0.0: "多条反馈被合并为一个模糊问题统一处理"
+      0.25: "区分了不同反馈但分析过程合并写在一起，边界模糊"
+      0.50: "每条反馈独立分析但未逐条生成独立分析报告"
+      0.75: "每条反馈有独立分析但处理顺序未按严重程度/依赖排序"
+      1.0: "每条反馈独立分析独立报告，按严重程度和依赖关系排列处理顺序，互不干扰，逐条闭环"
+  - id: "loop_confirmation_and_trace"
+    desc: "用户确认机制+修改后告知+完整可追溯"
+    evidence_from:
+      - "rules/240-human-feedback-analysis.md:步骤0 思考与规划"
+      - "rules/240-human-feedback-analysis.md:步骤5 执行改进"
+    levels:
+      0.0: "跳过用户确认直接执行修改"
+      0.25: "有确认但仅在修改前确认，修改后未告知改了什么"
+      0.50: "修改前和修改后均有告知但缺少'为什么这样改'的原因说明"
+      0.75: "确认-修改-告知-解释流程完整但分析报告格式不规范"
+      1.0: "完整闭环：初步识别等待确认 -> RCA分析 -> 改进建议呈报 -> 用户确认 -> 执行修改 -> 告知修改内容+原因 -> 分析报告格式规范可归档"

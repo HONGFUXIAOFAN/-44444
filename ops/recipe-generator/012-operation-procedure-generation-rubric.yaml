@@ -1,0 +1,99 @@
+---
+rule_id: "012-operation-procedure-generation"
+version: "0.1.0"
+description: "标准化操作流程生成 产出物Rubric评分表"
+---
+scale:
+  levels:
+    - id: none
+      value: 0.0
+      label: "无"
+    - id: weak
+      value: 0.25
+      label: "弱"
+    - id: partial
+      value: 0.50
+      label: "部分满足"
+    - id: good
+      value: 0.75
+      label: "良好"
+    - id: excellent
+      value: 1.0
+      label: "优秀"
+aggregation:
+  method: weighted_mean
+  dimension_min: 0.75
+  q_threshold: 0.85
+rubric:
+- key: operability
+  name: "可操作性"
+  weight: 0.40
+  checks:
+  - id: operability_step_actionable
+    desc: "每一步是否有具体可执行的动作说明，而非模糊描述"
+    evidence_from:
+      - "rules/012-operation-procedure-generation.md:操作流程步骤"
+    levels:
+      0.0: "步骤全部为模糊描述（如'适量'、'少许'、'翻炒一会儿'），无可执行的具体动作"
+      0.25: "不足半数步骤有具体动作描述，大量模糊用语"
+      0.50: "超过半数步骤有具体动作描述，但仍有较多模糊用语"
+      0.75: "绝大多数步骤有具体可执行的动作说明（时间、温度、用量具体），偶有模糊表达"
+      1.0: "每一步均有明确具体的可执行动作说明，无任何模糊用语"
+  - id: operability_judgment_standard
+    desc: "关键节点是否提供了可观测的判断标准（颜色、温度、质感等）"
+    evidence_from:
+      - "rules/012-operation-procedure-generation.md:关键节点"
+    levels:
+      0.0: "无任何关键节点标注或判断标准"
+      0.25: "仅少数节点有判断标准，且标准不可观测（如'炒熟即可'）"
+      0.50: "约半数关键节点有判断标准，部分可观测"
+      0.75: "多数关键节点有可观测的判断标准（颜色变化、冒泡程度、质地变化等）"
+      1.0: "每个关键节点均有清晰可观测的判断标准，用户可自行验证"
+- key: completeness
+  name: "完整性"
+  weight: 0.30
+  checks:
+  - id: completeness_five_stages
+    desc: "是否完整涵盖备料、预处理、烹饪、调味、成品5个阶段"
+    evidence_from:
+      - "rules/012-operation-procedure-generation.md:5阶段框架"
+    levels:
+      0.0: "阶段框架缺失，无阶段划分"
+      0.25: "仅覆盖1-2个阶段，结构严重不完整"
+      0.50: "覆盖3-4个阶段，存在缺失"
+      0.75: "5个阶段均覆盖，但个别阶段内容单薄"
+      1.0: "5个阶段完整覆盖，每个阶段内容充实、结构清晰"
+  - id: completeness_key_nodes
+    desc: "每个阶段的关键操作节点是否有遗漏"
+    evidence_from:
+      - "rules/012-operation-procedure-generation.md:关键节点"
+    levels:
+      0.0: "关键操作节点大量遗漏，流程不可执行"
+      0.25: "遗漏超过半数的关键操作节点"
+      0.50: "遗漏少量关键操作节点，主流程仍可执行但可能出错"
+      0.75: "仅遗漏个别次要节点，所有核心节点均已覆盖"
+      1.0: "所有关键操作节点无遗漏，甚至包含了可选的优化建议节点"
+- key: pitfall_avoidance
+  name: "避坑有效性"
+  weight: 0.30
+  checks:
+  - id: pitfall_error_identification
+    desc: "易错步骤是否被准确识别并标注"
+    evidence_from:
+      - "rules/012-operation-procedure-generation.md:错误避坑"
+    levels:
+      0.0: "无双提示，未标注任何易错步骤"
+      0.25: "仅标注了少量易错步骤，且部分标注不准确"
+      0.50: "标注了约半数易错步骤，大部分标注准确"
+      0.75: "绝大多数易错步骤被准确识别并标注"
+      1.0: "所有易错步骤均被精准识别，甚至标注了不易察觉的隐性错误"
+  - id: pitfall_suggestion_practical
+    desc: "避坑提示是否具体、可执行，而非泛泛而谈"
+    evidence_from:
+      - "rules/012-operation-procedure-generation.md:避坑提示"
+    levels:
+      0.0: "避坑提示为空或泛泛而谈（如'注意火候'）"
+      0.25: "避坑提示不够具体，罕见可执行的纠正措施"
+      0.50: "约半数的避坑提示包含具体的纠正方法"
+      0.75: "多数避坑提示采用'常见误区+正确做法'对比式表达，实用性强"
+      1.0: "每条避坑提示均有'误区→正确做法→原因'三段式结构，可独立作为教程使用"

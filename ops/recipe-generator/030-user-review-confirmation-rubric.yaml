@@ -1,0 +1,91 @@
+---
+rule_id: "030-user-review-confirmation"
+version: "0.1.0"
+description: "030-用户审查确认流程 产出物Rubric评分标准——审查完整度(0.40)/用户友好度(0.35)/整改有效性(0.25)"
+---
+scale:
+  levels:
+    - "none(0.0)"
+    - "weak(0.25)"
+    - "partial(0.5)"
+    - "good(0.75)"
+    - "excellent(1.0)"
+aggregation:
+  method: "weighted_mean"
+  dimension_min: 0.75
+  q_threshold: 0.85
+rubric:
+- key: "review_completeness"
+  name: "审查完整度"
+  weight: 0.40
+  checks:
+  - id: "completeness_7_items"
+    desc: "7项审查清单全部呈现，每项有子检查点"
+    evidence_from:
+      - "rules/030-user-review-confirmation.md:步骤2 引导用户逐项审查"
+    levels:
+      0.0: "审查项不足7项或有审查项缺失遗漏"
+      0.25: "7项审查完整但部分审查项无子检查点，仅标题检查"
+      0.50: "7项审查均有子检查点但部分检查点过于笼统（如仅'是否合理'）"
+      0.75: "7项审查完整且子检查点合理，但个别检查点缺少可操作的判断标准"
+      1.0: "7项审查100%完整，每项>=2个子检查点，每个检查点有明确判断标准，覆盖该维度的核心关注点"
+  - id: "completeness_assembly"
+    desc: "组装方案引用所有前置规则产出物"
+    evidence_from:
+      - "rules/030-user-review-confirmation.md:步骤1 组装完整配方方案"
+    levels:
+      0.0: "组装方案缺少关键模块（如缺配方参数表或缺成本核算）"
+      0.25: "组装方案覆盖主要模块但遗漏1-2个次要模块"
+      0.50: "所有模块均已引用但缺少基本信息汇总（配方总重/单份成本/总耗时等）"
+      0.75: "所有模块+基本信息完整但部分引用格式不一致或缺少来源标注"
+      1.0: "所有前置规则产出物完整引用，基本信息汇总齐全，各模块有清晰的规则来源标注"
+- key: "user_friendliness"
+  name: "用户友好度"
+  weight: 0.35
+  checks:
+  - id: "friendliness_language"
+    desc: "审查语言通俗易懂，适配中小B端用户知识水平"
+    evidence_from:
+      - "rules/030-user-review-confirmation.md:步骤2 引导用户逐项审查"
+    levels:
+      0.0: "使用大量技术术语，中小B端用户难以理解（如'操作流程架构是否符合标准'）"
+      0.25: "语言基本可懂但部分检查点用词偏学术（如'参数置信度'未解释）"
+      0.50: "语言通俗但缺少上下文解释（如直接问'置信度是否可接受'未给出具体数值）"
+      0.75: "语言通俗且有上下文，但对审查不通过时的引导语不够具体"
+      1.0: "所有检查点通俗易懂（'初中文化能听懂'标准），不通过时提供具体定位和修改指引，通过时有鼓励反馈"
+  - id: "friendliness_result_handling"
+    desc: "审查结果反馈清晰，整改建议具体可执行"
+    evidence_from:
+      - "rules/030-user-review-confirmation.md:步骤3 处理审查结果"
+    levels:
+      0.0: "没有明确的审查结果处理说明"
+      0.25: "有处理说明但只区分通过/不通过，无多项不通过场景"
+      0.50: "三档处理（全部通过/某项不通过/多项不通过）均有说明但回退路径模糊"
+      0.75: "回退路径明确到规则ID但未说明回退后需重新审查哪些下游项"
+      1.0: "三档处理完整，回退路径精准到规则ID，下游受影响项清单清晰，整改后重新审查范围明确"
+- key: "improvement_effectiveness"
+  name: "整改有效性"
+  weight: 0.25
+  checks:
+  - id: "improvement_traceback"
+    desc: "不通过项有明确回退路径和重新审查机制"
+    evidence_from:
+      - "rules/030-user-review-confirmation.md:步骤3 处理审查结果"
+      - "rules/030-user-review-confirmation.md:规则约束"
+    levels:
+      0.0: "不通过时无回退机制说明，仅告知未通过"
+      0.25: "有回退概念但未指定需要修改哪个规则"
+      0.50: "指定了回退规则ID但未说明回退后的重新审查范围"
+      0.75: "回退规则ID+重新审查范围明确，但未限定最大整改轮数"
+      1.0: "完整闭环：回退规则ID -> 修改 -> 重新审查受影响项 -> 最多3轮，审查记录完整保留，每轮状态可追溯"
+  - id: "improvement_revision_loop"
+    desc: "整改循环最多3轮，每轮状态可追溯"
+    evidence_from:
+      - "rules/030-user-review-confirmation.md:规则约束"
+      - "AGENTS.md:五、质量标准 验收流程"
+    levels:
+      0.0: "无整改轮数限制，允许无限循环"
+      0.25: "有3轮限制但未说明3轮后如何处理"
+      0.50: "3轮限制明确但整改过程中缺少轮次标记和状态记录"
+      0.75: "整改轮次有标记但审查记录未完整保留各轮状态"
+      1.0: "3轮限制明确且有退出机制，每轮整改有状态记录，审查记录包含各轮次的确认/不通过详情，完整可追溯"

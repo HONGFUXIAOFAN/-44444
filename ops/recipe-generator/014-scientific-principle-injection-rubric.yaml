@@ -1,0 +1,99 @@
+---
+rule_id: "014-scientific-principle-injection"
+version: "0.1.0"
+description: "科学原理通俗化注入 产出物Rubric评分表"
+---
+scale:
+  levels:
+    - id: none
+      value: 0.0
+      label: "无"
+    - id: weak
+      value: 0.25
+      label: "弱"
+    - id: partial
+      value: 0.50
+      label: "部分满足"
+    - id: good
+      value: 0.75
+      label: "良好"
+    - id: excellent
+      value: 1.0
+      label: "优秀"
+aggregation:
+  method: weighted_mean
+  dimension_min: 0.75
+  q_threshold: 0.85
+rubric:
+- key: accessibility
+  name: "通俗度"
+  weight: 0.45
+  checks:
+  - id: accessibility_analogy_appropriate
+    desc: "使用的日常类比是否贴切、易于理解"
+    evidence_from:
+      - "rules/014-scientific-principle-injection.md:通俗类比"
+    levels:
+      0.0: "无类比使用，全部为专业术语堆砌"
+      0.25: "少数类比使用但牵强附会，反而增加理解难度"
+      0.50: "约半数类比贴切，但仍有部分类比与原理关联不强"
+      0.75: "多数类比贴切恰当，能有效帮助初中文化用户理解科学原理"
+      1.0: "所有类比均精准贴切，选择日常生活中最常见、最直观的类比素材"
+  - id: accessibility_language_level
+    desc: "是否避免超纲术语，初中文化用户能否读懂"
+    evidence_from:
+      - "rules/014-scientific-principle-injection.md:初中文化"
+    levels:
+      0.0: "全部为专业术语，初中文化用户完全无法理解"
+      0.25: "大量专业术语未解释，仅少数加了通俗注释"
+      0.50: "过半内容做了通俗化处理，但仍有未解释的专业术语"
+      0.75: "绝大多数术语均被通俗化解释，偶有遗漏，整体阅读流畅"
+      1.0: "全文无超纲术语（或将术语全部转化为通俗表达），初中文化用户可无障碍阅读"
+- key: accuracy
+  name: "准确性"
+  weight: 0.30
+  checks:
+  - id: accuracy_principle_correct
+    desc: "科学原理描述是否在通俗化过程中保持准确、未歪曲"
+    evidence_from:
+      - "rules/014-scientific-principle-injection.md:科学原理"
+    levels:
+      0.0: "原理描述存在重大事实错误，误导用户"
+      0.25: "多个原理描述存在明显错误或过度简化导致失真"
+      0.50: "多数原理基本正确，但部分存在小误差或不严谨"
+      0.75: "所有原理描述准确，通俗化过程中未歪曲科学本质"
+      1.0: "原理描述既通俗又精确，在简化与准确性之间达到完美平衡"
+  - id: accuracy_step_matching
+    desc: "原理注入是否发生在确实涉及该原理的步骤中（不张冠李戴）"
+    evidence_from:
+      - "rules/014-scientific-principle-injection.md:关键步骤匹配"
+    levels:
+      0.0: "原理与步骤完全错配，张冠李戴严重"
+      0.25: "多数原理匹配错误，仅个别正确"
+      0.50: "约半数原理与步骤正确匹配，部分误配"
+      0.75: "绝大多数原理与步骤匹配正确，偶有边界模糊情况"
+      1.0: "每条原理精确注入到确实涉及该原理的步骤中，无任何误配"
+- key: coverage_sciprinciple
+  name: "覆盖度"
+  weight: 0.25
+  checks:
+  - id: coverage_key_steps_covered
+    desc: "配方中涉及科学原理的关键步骤是否均有解释"
+    evidence_from:
+      - "rules/014-scientific-principle-injection.md:关键步骤覆盖"
+    levels:
+      0.0: "无任何科学原理解释注入"
+      0.25: "仅1-2个关键步骤有原理解释，多数遗漏"
+      0.50: "约半数关键步骤有原理解释，部分重要步骤遗漏"
+      0.75: "绝大多数关键步骤有原理解释，仅遗漏个别次要步骤"
+      1.0: "所有涉及科学原理的步骤均有恰当的通俗化解释"
+  - id: coverage_just_right
+    desc: "是否在合理位置解释，不过度或遗漏"
+    evidence_from:
+      - "rules/014-scientific-principle-injection.md:解释位置"
+    levels:
+      0.0: "解释位置混乱，打断操作流程阅读体验"
+      0.25: "多数解释位置不当，或冗长啰嗦破坏节奏"
+      0.50: "部分解释过长或过短，位置选择一般"
+      0.75: "多数解释长度适中、位置恰当，不打断操作流程"
+      1.0: "每条解释精准控制在30-80字，在用户最可能产生疑问的位置自然插入，阅读体验流畅"

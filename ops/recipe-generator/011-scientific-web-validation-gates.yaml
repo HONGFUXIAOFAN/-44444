@@ -1,0 +1,269 @@
+---
+rule_id: scientific-web-validation
+version: 0.1.0
+description: 科学性联网验证产出物Gates检查
+phase: building
+---
+context:
+  purpose: 校验scientific-web-validation规则产出物的合规性与完整性
+  scope: |
+    本Gates配置覆盖三件套文件(SOT/Gates/Rubric)的：
+    - 文件存在性与路径有效性
+    - 结构合规性（YAML frontmatter、Gates schema、Rubric schema）
+    - 内容完整性（必需字段、必需Gate、权重校验）
+    - 领域特有约束（触发器/010、联网交叉验证/置信度、四种验证维度、安全性验证）
+  consumer: ssot-judge、Administrator
+gates:
+- id: gate0_assets
+  name: 三件套文件存在性检查
+  critical: true
+  checks:
+  - type: custom_script
+    script_template: templates/gate-scripts/check_file_paths.py
+    params:
+      p1: ssot/recipe-generator/scientific-web-validation-ssot.md
+      p2: ops/recipe-generator/scientific-web-validation-gates.yaml
+      p3: ops/recipe-generator/scientific-web-validation-rubric.yaml
+- id: gate0_input_ssot_assets
+  name: 输入SSOT三件套文件存在性检查
+  critical: true
+  checks:
+  - type: custom_script
+    script_template: templates/gate-scripts/check_file_paths.py
+    params:
+      p1: ssot/recipe-generator/recipe-parameter-generation-ssot.md
+      p2: ops/recipe-generator/recipe-parameter-generation-gates.yaml
+      p3: ops/recipe-generator/recipe-parameter-generation-rubric.yaml
+- id: gate1_ssot_frontmatter
+  name: SSOT-YAML头必填字段检查
+  critical: false
+  checks:
+  - type: custom_script
+    script_template: templates/gate-scripts/check_yaml_frontmatter.py
+    params:
+      target_file: ssot/recipe-generator/scientific-web-validation-ssot.md
+      required_fields:
+      - name
+      - version
+      - description
+      - applies_to
+      - deliverable_vision
+      - deliverable_type
+      - related_rule
+      - configs
+- id: gate2_gates_schema
+  name: Gates-YAML结构合规检查
+  critical: true
+  checks:
+  - type: custom_script
+    script_template: templates/gate-scripts/check_yaml_schema.py
+    params:
+      target_file: ops/recipe-generator/scientific-web-validation-gates.yaml
+      required_keys:
+      - context
+      - gates
+      - decision
+- id: gate3_rubric_schema
+  name: Rubric-YAML结构合规检查
+  critical: true
+  checks:
+  - type: custom_script
+    script_template: templates/gate-scripts/check_yaml_schema.py
+    params:
+      target_file: ops/recipe-generator/scientific-web-validation-rubric.yaml
+      required_keys:
+      - scale
+      - aggregation
+      - rubric
+- id: gate4_path_validity
+  name: configs路径有效性检查
+  critical: false
+  checks:
+  - type: custom_script
+    script_template: templates/gate-scripts/check_config_paths.py
+    params:
+      target_file: ssot/recipe-generator/scientific-web-validation-ssot.md
+      path_keys:
+      - configs.gates
+      - configs.rubric
+- id: gate5_required_gates
+  name: 必需Gate齐全检查
+  critical: true
+  checks:
+  - type: custom_script
+    script_template: templates/gate-scripts/check_required_gates.py
+    params:
+      target_file: ops/recipe-generator/scientific-web-validation-gates.yaml
+      required_gates:
+      - gate0_assets
+      - gate0_input_ssot_assets
+      - gate1_ssot_frontmatter
+      - gate2_gates_schema
+      - gate3_rubric_schema
+      - gate4_path_validity
+      - gate5_required_gates
+      - gate6_weight_sum
+      - gate7_eval_dataset
+      - gate8_universal_gates_unchanged
+      - gate10_trigger
+      - gate10_web_search
+      - gate10_confidence
+      - gate10_ingredient_check
+      - gate10_quantity_check
+      - gate10_temp_time_check
+      - gate10_safety_check
+      - gate10_acceptance
+- id: gate6_weight_sum
+  name: Rubric权重总和检查
+  critical: false
+  checks:
+  - type: custom_script
+    script_template: templates/gate-scripts/check_weight_sum.py
+    params:
+      target_file: ops/recipe-generator/scientific-web-validation-rubric.yaml
+      tolerance: 0.05
+- id: gate7_eval_dataset
+  name: 评测数据集检查
+  critical: false
+  checks:
+  - type: custom_script
+    script_template: templates/gate-scripts/check_eval_dataset.py
+    params:
+      base_dir: eval/recipe-generator/scientific-web-validation
+      min_cases: 3
+- id: gate8_universal_gates_unchanged
+  name: 通用Gates未修改检查
+  critical: true
+  checks:
+  - type: custom_script
+    script_template: templates/gate-scripts/check_universal_gates.py
+    params:
+      target_file: ops/recipe-generator/scientific-web-validation-gates.yaml
+      universal_gate_ids:
+      - gate0_assets
+      - gate0_input_ssot_assets
+      - gate1_ssot_frontmatter
+      - gate2_gates_schema
+      - gate3_rubric_schema
+      - gate4_path_validity
+      - gate5_required_gates
+      - gate6_weight_sum
+      - gate7_eval_dataset
+      - gate8_universal_gates_unchanged
+      reference_file: ops/recipe-generator/scientific-web-validation-gates.yaml
+- id: gate10_trigger
+  name: 触发器定义检查
+  critical: true
+  checks:
+  - type: custom_script
+    script_template: templates/gate-scripts/check_ssot_section.py
+    params:
+      target_file: ssot/recipe-generator/scientific-web-validation-ssot.md
+      section_keyword: WHEN
+      required_phrases:
+      - 触发
+      - "010"
+- id: gate10_web_search
+  name: 联网搜索交叉验证检查
+  critical: true
+  checks:
+  - type: custom_script
+    script_template: templates/gate-scripts/check_ssot_section.py
+    params:
+      target_file: ssot/recipe-generator/scientific-web-validation-ssot.md
+      section_keyword: 联网搜索
+      required_phrases:
+      - 交叉验证
+      - 置信度
+- id: gate10_confidence
+  name: 置信度计算检查
+  critical: true
+  checks:
+  - type: custom_script
+    script_template: templates/gate-scripts/check_ssot_section.py
+    params:
+      target_file: ssot/recipe-generator/scientific-web-validation-ssot.md
+      section_keyword: 置信度
+      required_phrases:
+      - 来源
+      - 一致性
+- id: gate10_ingredient_check
+  name: 原料种类验证检查
+  critical: true
+  checks:
+  - type: custom_script
+    script_template: templates/gate-scripts/check_ssot_section.py
+    params:
+      target_file: ssot/recipe-generator/scientific-web-validation-ssot.md
+      section_keyword: 原料种类验证
+      required_phrases:
+      - 验证
+- id: gate10_quantity_check
+  name: 用量比例验证检查
+  critical: true
+  checks:
+  - type: custom_script
+    script_template: templates/gate-scripts/check_ssot_section.py
+    params:
+      target_file: ssot/recipe-generator/scientific-web-validation-ssot.md
+      section_keyword: 用量比例验证
+      required_phrases:
+      - 验证
+      - 比例
+- id: gate10_temp_time_check
+  name: 温度时间验证检查
+  critical: true
+  checks:
+  - type: custom_script
+    script_template: templates/gate-scripts/check_ssot_section.py
+    params:
+      target_file: ssot/recipe-generator/scientific-web-validation-ssot.md
+      section_keyword: 温度时间验证
+      required_phrases:
+      - 温度
+      - 时间
+- id: gate10_safety_check
+  name: 安全性验证检查
+  critical: true
+  checks:
+  - type: custom_script
+    script_template: templates/gate-scripts/check_ssot_section.py
+    params:
+      target_file: ssot/recipe-generator/scientific-web-validation-ssot.md
+      section_keyword: 安全性验证
+      required_phrases:
+      - 安全
+      - 验证
+- id: gate10_acceptance
+  name: 验收检查
+  critical: false
+  checks:
+  - type: custom_script
+    script_template: templates/gate-scripts/check_acceptance_items.py
+    params:
+      target_file: ssot/recipe-generator/scientific-web-validation-ssot.md
+      min_checklist_items: 6
+      required_keywords:
+      - YAML
+      - frontmatter
+      - CTA
+      - critical gate
+      - Rubric
+decision:
+  gate_pass_required: all_critical
+  failure_action: block
+  max_retry: 3
+  critical_gates:
+  - gate0_assets
+  - gate0_input_ssot_assets
+  - gate2_gates_schema
+  - gate3_rubric_schema
+  - gate5_required_gates
+  - gate8_universal_gates_unchanged
+  - gate10_trigger
+  - gate10_web_search
+  - gate10_confidence
+  - gate10_ingredient_check
+  - gate10_quantity_check
+  - gate10_temp_time_check
+  - gate10_safety_check

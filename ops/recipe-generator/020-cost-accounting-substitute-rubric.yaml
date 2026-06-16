@@ -1,0 +1,99 @@
+---
+rule_id: "020-cost-accounting-substitute"
+version: "0.1.0"
+description: "成本核算与平替推荐 产出物Rubric评分表"
+---
+scale:
+  levels:
+    - id: none
+      value: 0.0
+      label: "无"
+    - id: weak
+      value: 0.25
+      label: "弱"
+    - id: partial
+      value: 0.50
+      label: "部分满足"
+    - id: good
+      value: 0.75
+      label: "良好"
+    - id: excellent
+      value: 1.0
+      label: "优秀"
+aggregation:
+  method: weighted_mean
+  dimension_min: 0.75
+  q_threshold: 0.85
+rubric:
+- key: calculation_accuracy
+  name: "计算准确性"
+  weight: 0.40
+  checks:
+  - id: calc_accuracy_ingredient_cost
+    desc: "每项原料用量×单价计算是否正确"
+    evidence_from:
+      - "rules/020-cost-accounting-substitute.md:原料成本计算"
+    levels:
+      0.0: "多项原料成本计算严重错误，存在数量级偏差"
+      0.25: "近半原料成本计算有误，偏差较大"
+      0.50: "多数计算正确，但个别原料存在计算偏差或单位换算错误"
+      0.75: "所有原料成本计算正确，仅少量舍入误差"
+      1.0: "所有原料成本计算精确无误，单位换算完全正确"
+  - id: calc_accuracy_aggregation
+    desc: "总成本、单份成本、占比计算是否正确"
+    evidence_from:
+      - "rules/020-cost-accounting-substitute.md:汇总与分摊"
+    levels:
+      0.0: "总成本或单份成本计算存在重大错误"
+      0.25: "汇总有误（遗漏原料或重复计算），导致偏差>20%"
+      0.50: "总成本基本正确但单份分摊有误，或占比计算有少量偏差"
+      0.75: "总成本、单份成本、占比均计算正确，逻辑清晰"
+      1.0: "所有汇总计算精确无误，且提供了分项明细与交叉验证"
+- key: substitute_practicality
+  name: "平替实用性"
+  weight: 0.35
+  checks:
+  - id: substitute_flavor_similarity
+    desc: "推荐的平替原料与原原料风味相似度是否高"
+    evidence_from:
+      - "rules/020-cost-accounting-substitute.md:风味接近"
+    levels:
+      0.0: "平替推荐与原原料风味完全不相关"
+      0.25: "多数平替风味差异明显，替换后将大幅改变菜品味道"
+      0.50: "部分平替风味接近，但部分差异较大需额外调整"
+      0.75: "多数平替风味相似度高，替换后对整体风味影响较小"
+      1.0: "所有平替风味高度相似，替换后非专业人士几乎无法察觉差异"
+  - id: substitute_availability
+    desc: "推荐的平替原料在普通市场是否容易买到"
+    evidence_from:
+      - "rules/020-cost-accounting-substitute.md:实际可得"
+    levels:
+      0.0: "平替均为稀缺或特殊渠道原料，普通消费者无法获取"
+      0.25: "多数平替不易购买，仅在大型超市或线上平台有售"
+      0.50: "部分平替在普通市场可买到，部分需特殊渠道"
+      0.75: "多数平替在普通菜市场或超市常见，购买方便"
+      1.0: "所有平替均为日常常见原料，家门口菜市场/超市随时可买"
+- key: transparency
+  name: "透明度"
+  weight: 0.25
+  checks:
+  - id: transparency_calculation_traceable
+    desc: "成本计算过程是否可追溯、可验证"
+    evidence_from:
+      - "rules/020-cost-accounting-substitute.md:计算过程清晰"
+    levels:
+      0.0: "仅给出最终数字，无任何计算过程"
+      0.25: "仅有简要汇总，缺少逐项计算明细"
+      0.50: "提供了部分计算明细，但缺少关键中间步骤"
+      0.75: "提供了完整的逐项计算明细，用户可自行验算"
+      1.0: "计算过程完整呈现（用量×单价→原料成本→占比→总成本→单份成本），每步可追溯验证"
+  - id: transparency_substitute_reasoning
+    desc: "每个平替推荐是否附带了风味差异说明与使用建议"
+    evidence_from:
+      - "rules/020-cost-accounting-substitute.md:替代理由充分"
+    levels:
+      0.0: "平替推荐无任何说明，仅给出替代原料名称"
+      0.25: "少数平替有简要说明，多数缺乏风味差异与使用建议"
+      0.50: "约半数平替附带了风味差异或使用建议之一"
+      0.75: "多数平替附带了风味差异说明与使用建议，用户可据此判断是否采用"
+      1.0: "所有平替均有完整说明（风味差异+使用注意事项+节省金额+推荐等级），用户全面知情可选"

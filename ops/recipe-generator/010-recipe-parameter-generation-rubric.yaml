@@ -1,0 +1,137 @@
+---
+rule_id: recipe-parameter-generation
+version: 0.1.0
+description: 配方参数生成产出物Rubric评分
+---
+scale:
+  levels:
+  - label: none
+    points: 0.0
+    hint: 完全缺失，该维度未涉及任何内容
+  - label: weak
+    points: 0.25
+    hint: 严重不足，仅有粗略提及但无实质定义
+  - label: partial
+    points: 0.5
+    hint: 部分满足，有基本框架但细节不完整
+  - label: good
+    points: 0.75
+    hint: 基本满足，主体内容完整且可用
+  - label: excellent
+    points: 1.0
+    hint: 完全满足，定义精确且覆盖所有边界场景
+aggregation:
+  method: weighted_mean
+  dimension_min: 0.75
+  q_threshold: 0.85
+rubric:
+- key: precision
+  name: 精确性
+  weight: 0.40
+  checks:
+  - id: pre_quantity_unit
+    desc: 原料用量是否全部精确到g/ml，是否消除了模糊描述
+    evidence_from:
+    - rules/recipe-parameter-generation.md:产出物定义
+    - rules/recipe-parameter-generation.md:Technique
+    levels:
+      0.0: 用量全部为模糊描述（适量/少许等）
+      0.25: 部分用量有数值但大量仍为模糊描述
+      0.5: 主要原料有精确用量，辅料/调料仍有模糊描述
+      0.75: 所有原料均有g/ml数值，基本消除模糊描述
+      1.0: 所有用量精确到g/ml并含1位小数，完全消除模糊描述
+  - id: pre_quantity_range
+    desc: 用量数值是否在合理范围内
+    evidence_from:
+    - rules/recipe-parameter-generation.md:Commonness
+    - rules/recipe-parameter-generation.md:Technique
+    levels:
+      0.0: 用量明显不合理（如5000g盐）
+      0.25: 部分用量超出合理范围
+      0.5: 大部分用量在合理范围但有明显误差
+      0.75: 用量均在合理范围内（参考烹饪常识基准）
+      1.0: 用量精准且在合理范围内的同时给出了可调区间
+  - id: pre_ratio_correctness
+    desc: 主料/辅料/调料比例是否符合烹饪规律
+    evidence_from:
+    - rules/recipe-parameter-generation.md:Commonness
+    - rules/recipe-parameter-generation.md:Technique
+    levels:
+      0.0: 比例完全不合理
+      0.25: 仅部分比例合理
+      0.5: 主要比例（主料:辅料）基本合理
+      0.75: 主要比例和调味料比例均在经验范围内
+      1.0: 所有比例经多源交叉验证确认合理
+- key: completeness
+  name: 完整性
+  weight: 0.35
+  checks:
+  - id: cmp_ingredient_category
+    desc: 原料清单是否覆盖主料、辅料、调味料三类
+    evidence_from:
+    - rules/recipe-parameter-generation.md:产出物定义
+    - rules/recipe-parameter-generation.md:Commonness
+    levels:
+      0.0: 仅列出单一类型原料
+      0.25: 缺失某一完整类别
+      0.5: 三类均有但某类存在明显遗漏
+      0.75: 三类原料完整覆盖
+      1.0: 三类完整覆盖且标注了可选/替代原料
+  - id: cmp_param_fields
+    desc: 配方参数表字段是否齐全
+    evidence_from:
+    - rules/recipe-parameter-generation.md:产出物定义
+    levels:
+      0.0: 缺失核心字段
+      0.25: 仅有原料列表缺少用量
+      0.5: 有原料+用量但缺少total_weight/servings
+      0.75: 包含ingredients/total_weight/servings/base_recipe_ref全部字段
+      1.0: 所有字段齐全且包含预处理方式、备注等增强字段
+  - id: cmp_derivation_trace
+    desc: 是否提供了用量推演依据
+    evidence_from:
+    - rules/recipe-parameter-generation.md:产出物定义
+    - rules/recipe-parameter-generation.md:Technique
+    levels:
+      0.0: 无推演依据
+      0.25: 仅提及来源但无具体依据
+      0.5: 部分用量有来源说明
+      0.75: 每个用量有推演依据（经验公式/标准配比/来源引用）
+      1.0: 完整推演日志，含多源对比和选择理由
+- key: usability
+  name: 可用性
+  weight: 0.25
+  checks:
+  - id: usa_format_consistency
+    desc: 参数表格式是否规范统一
+    evidence_from:
+    - rules/recipe-parameter-generation.md:Technique
+    - rules/recipe-parameter-generation.md:Art
+    levels:
+      0.0: 格式混乱无法解析
+      0.25: 基本可读但格式不统一
+      0.5: 格式基本统一但存在不一致
+      0.75: 格式完全统一（所有用量同单位体系）
+      1.0: 格式规范统一且有schema定义，人机双可读
+  - id: usa_downstream_ready
+    desc: 参数表是否可直接供下游规则消费
+    evidence_from:
+    - rules/recipe-parameter-generation.md:downstream_consumers
+    - rules/recipe-parameter-generation.md:产出物定义
+    levels:
+      0.0: 无法被下游消费
+      0.25: 需要大量手动处理才能消费
+      0.5: 需要适度处理
+      0.75: 可直接被验证和组装步骤消费
+      1.0: 完整schema定义，所有下游消费者可直接使用无需转换
+  - id: usa_regional_adaptation
+    desc: 是否考虑了地域口味差异对参数的影响
+    evidence_from:
+    - rules/recipe-parameter-generation.md:Art
+    - rules/recipe-parameter-generation.md:Commonness
+    levels:
+      0.0: 未考虑地域差异
+      0.25: 提及地域差异但未体现在参数中
+      0.5: 对个别菜品有地域适配
+      0.75: 系统性地定义了地域差异对用量的调整规则
+      1.0: 完整的地域适配体系，覆盖主要菜系的口味偏好矩阵
