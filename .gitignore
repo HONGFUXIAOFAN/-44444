@@ -1,9 +1,64 @@
-# macOS
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# IDEs
+*.code-workspace
+.vscode/launch.json
+.vscode/c_cpp_properties.json
+.idea/
+.obsidian/
+*.swp
+*.swo
+*~
+
+# OS
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Project specific
+temp/
+tmp/
+*.tmp
 
 # Claude local settings (personal, not to be shared)
 .claude/settings.local.json
 
-# Temporary/output files
-*.tmp
-*.bak
+# Output files
+ops/*.docx
+ops/*.pdf
