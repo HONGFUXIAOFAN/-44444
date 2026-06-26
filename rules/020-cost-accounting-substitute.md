@@ -1,11 +1,13 @@
 ---
 rule_id: "020-cost-accounting-substitute"
 rule_name: "成本核算与平替推荐"
-version: "0.1.0"
+version: "0.2.0"
 phase: "building"
 priority: "P0"
 depends_on: ["010-recipe-parameter-generation"]
 created: "2026-05-24T00:00:00+0800"
+modified: "2026-06-26T00:00:00+0800"
+note: "成本核算仅供030审查环节用户内部参考，不导出至最终交付文档（031）。网络价格波动大，用户需自行核实实际采购价。"
 tags: ["增强补充", "成本核算", "平替推荐", "recipe-generator"]
 ---
 
