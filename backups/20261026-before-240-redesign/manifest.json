@@ -1,0 +1,92 @@
+[
+  {
+    "path": "rules/CLAUDE.md",
+    "backup": "/Users/haohaochifan/Desktop/餐饮配方生成器配套/backups/20261026-before-240-redesign/rules__CLAUDE.md",
+    "sha256_before": "bca12087dc90ab139de4efcbd1449cf6b1ee6555f4b46eb01127e7c2dab63c5e"
+  },
+  {
+    "path": "rules/001-input-parse-sop.md",
+    "backup": "/Users/haohaochifan/Desktop/餐饮配方生成器配套/backups/20261026-before-240-redesign/rules__001-input-parse-sop.md",
+    "sha256_before": "72fe2d3fdc542af57e1eb93b278f86568b70e3f63644c1c43904482620a54619"
+  },
+  {
+    "path": "rules/002-recipe-generation-orchestrator-sop.md",
+    "backup": "/Users/haohaochifan/Desktop/餐饮配方生成器配套/backups/20261026-before-240-redesign/rules__002-recipe-generation-orchestrator-sop.md",
+    "sha256_before": "7596437e7504990deb3f73ed5b00db5c50f6db1b50ab542d877a30b09d53c2c0"
+  },
+  {
+    "path": "rules/010-recipe-parameter-generation.md",
+    "backup": "/Users/haohaochifan/Desktop/餐饮配方生成器配套/backups/20261026-before-240-redesign/rules__010-recipe-parameter-generation.md",
+    "sha256_before": "2054b53a64ad8256b305c83d6602377bfde7551fd8e392a46d55d9f09b3da60d"
+  },
+  {
+    "path": "rules/011-scientific-web-validation.md",
+    "backup": "/Users/haohaochifan/Desktop/餐饮配方生成器配套/backups/20261026-before-240-redesign/rules__011-scientific-web-validation.md",
+    "sha256_before": "dc44f6f9f935ba8b2a7ff7119ede374bb7044c2ed7fd77e7f382ee04cb04420d"
+  },
+  {
+    "path": "rules/012-operation-procedure-generation.md",
+    "backup": "/Users/haohaochifan/Desktop/餐饮配方生成器配套/backups/20261026-before-240-redesign/rules__012-operation-procedure-generation.md",
+    "sha256_before": "b326699962c701c929888f4b2e79a9ec9e06db81dd7958937fa11b3c619eb868"
+  },
+  {
+    "path": "rules/013-regional-taste-adaptation.md",
+    "backup": "/Users/haohaochifan/Desktop/餐饮配方生成器配套/backups/20261026-before-240-redesign/rules__013-regional-taste-adaptation.md",
+    "sha256_before": "ce167c89cb297154403f620bfe0992c68fcafb5fee0a4b378ede7ec3922757ba"
+  },
+  {
+    "path": "rules/014-scientific-principle-injection.md",
+    "backup": "/Users/haohaochifan/Desktop/餐饮配方生成器配套/backups/20261026-before-240-redesign/rules__014-scientific-principle-injection.md",
+    "sha256_before": "f16e89951b91ca4fc75404b4e501a6d389ac57d9df5d223970ffed5198c2a5ea"
+  },
+  {
+    "path": "rules/020-cost-accounting-substitute.md",
+    "backup": "/Users/haohaochifan/Desktop/餐饮配方生成器配套/backups/20261026-before-240-redesign/rules__020-cost-accounting-substitute.md",
+    "sha256_before": "39fb7541c103581c1403f4317c10f221879f0b2168242a78e1b3ca68cc054b5c"
+  },
+  {
+    "path": "rules/021-food-additive-recommendation.md",
+    "backup": "/Users/haohaochifan/Desktop/餐饮配方生成器配套/backups/20261026-before-240-redesign/rules__021-food-additive-recommendation.md",
+    "sha256_before": "e5f2be7401589bba109a9becf37a347b0cde7dc87649a8ada5211504528f4c18"
+  },
+  {
+    "path": "rules/022-practical-effectiveness-validation.md",
+    "backup": "/Users/haohaochifan/Desktop/餐饮配方生成器配套/backups/20261026-before-240-redesign/rules__022-practical-effectiveness-validation.md",
+    "sha256_before": "c4826d720483e51e335993427feb10ef2563a8edb487eb3986c6fda56efb3041"
+  },
+  {
+    "path": "rules/023-cross-module-consistency-check.md",
+    "backup": "/Users/haohaochifan/Desktop/餐饮配方生成器配套/backups/20261026-before-240-redesign/rules__023-cross-module-consistency-check.md",
+    "sha256_before": "cc1197c00e09fa39d2404675bc6d3d09cc5afe404ce4ed41cb14defd321c80ee"
+  },
+  {
+    "path": "rules/024-recipe-holistic-validation.md",
+    "backup": "/Users/haohaochifan/Desktop/餐饮配方生成器配套/backups/20261026-before-240-redesign/rules__024-recipe-holistic-validation.md",
+    "sha256_before": "8390078e25f27290ea3bdcb99f9f2183f3a14544326d5d8e19d414f4f0bd60ff"
+  },
+  {
+    "path": "rules/030-user-review-confirmation.md",
+    "backup": "/Users/haohaochifan/Desktop/餐饮配方生成器配套/backups/20261026-before-240-redesign/rules__030-user-review-confirmation.md",
+    "sha256_before": "eb0eb117a9925999959f938a2d803b8ef9db9fcbcb39a354440f8a32338c2d90"
+  },
+  {
+    "path": "rules/031-export-word-pdf.md",
+    "backup": "/Users/haohaochifan/Desktop/餐饮配方生成器配套/backups/20261026-before-240-redesign/rules__031-export-word-pdf.md",
+    "sha256_before": "408a0e6820008f6c8bea915b094cdd6a94113ef313a305f8c19abc9abe15e338"
+  },
+  {
+    "path": "rules/domain-overview.md",
+    "backup": "/Users/haohaochifan/Desktop/餐饮配方生成器配套/backups/20261026-before-240-redesign/rules__domain-overview.md",
+    "sha256_before": "11af4d6987b984a2f7f85f579c7b3dd91d76a46e583bfd8152654af10e75ceae"
+  },
+  {
+    "path": "rules/rule-plan.md",
+    "backup": "/Users/haohaochifan/Desktop/餐饮配方生成器配套/backups/20261026-before-240-redesign/rules__rule-plan.md",
+    "sha256_before": "3749bbf8a0b99e424ee65c577cc25cd23b6bce032eb0f146a904d97c5a0f0431"
+  },
+  {
+    "path": "rules/240-human-feedback-analysis.md",
+    "backup": "/Users/haohaochifan/Desktop/餐饮配方生成器配套/backups/20261026-before-240-redesign/rules__240-human-feedback-analysis.md",
+    "sha256_before": "97de850f5cd32cc7c20ec921c1f5fbd8249ac079fcfbe8ca4db912f5ec1c58ea"
+  }
+]
